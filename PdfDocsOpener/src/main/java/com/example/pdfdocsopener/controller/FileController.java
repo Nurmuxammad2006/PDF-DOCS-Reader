@@ -1,10 +1,9 @@
 package com.example.pdfdocsopener.controller;
 
 import com.example.pdfdocsopener.entity.FileMetadata;
-import com.example.pdfdocsopener.services.FileService;
+import com.example.pdfdocsopener.repository.FileMetadataRepository;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
+
 import java.util.List;
 
 @RestController
@@ -12,21 +11,14 @@ import java.util.List;
 @CrossOrigin(origins = "*")
 public class FileController {
 
-    private final FileService fileService;
+    private final FileMetadataRepository repository;
 
-    public FileController(FileService fileService) {
-        this.fileService = fileService;
+    public FileController(FileMetadataRepository repository) {
+        this.repository = repository;
     }
 
-    @PostMapping("/upload")
-    public FileMetadata uploadFile(
-            @RequestParam("file") MultipartFile file,
-            @RequestParam("telegramUserId") Long telegramUserId) throws IOException {
-        return fileService.saveFile(file, telegramUserId);
-    }
-
-    @GetMapping("/user/{telegramUserId}")
-    public List<FileMetadata> getFilesByUser(@PathVariable Long telegramUserId) {
-        return fileService.getFilesByUser(telegramUserId);
+    @GetMapping
+    public List<FileMetadata> getFilesByUser(@RequestParam Long telegramUserId) {
+        return repository.findByTelegramUserId(telegramUserId);
     }
 }

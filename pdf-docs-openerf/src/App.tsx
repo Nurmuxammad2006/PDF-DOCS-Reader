@@ -25,7 +25,11 @@ export default function App() {
   const [uploading, setUploading] = useState(false);
 
   // Extract Telegram User ID, fallback to 12345 for browser testing
-  const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 12345;
+  const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 12345678; // fallback for browser testing
+
+  fetch(`https://canola-deacon-occultist.ngrok-free.dev/api/files?telegramUserId=${telegramUserId}`)
+      .then(res => res.json())
+      .then(data => setFiles(data));
 
   const loadFiles = async () => {
     try {
