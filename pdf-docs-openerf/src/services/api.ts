@@ -1,23 +1,31 @@
-import type {FileMetadata} from '../types/file';
+import axios from 'axios';
+import type { FileMetadata } from '../types/file';
 
-const API_BASE_URL = 'http://localhost:8080/api/files';
+// Use your backend ngrok URL here so your phone can reach Spring Boot
+const API_BASE_URL = 'https://canola-deacon-occultist.ngrok-free.dev/api';
 
-export const fetchUserFiles = async (telegramUserId: number): Promise<FileMetadata[]> => {
-    const response = await fetch(`${API_BASE_URL}/user/${telegramUserId}`);
-    if (!response.ok) throw new Error('Failed to fetch files');
-    return response.json();
+export const fetchUserFiles = async (
+    telegramUserId: number
+): Promise<FileMetadata[]> => {
+    const response = await axios.get(`${API_BASE_URL}/files`, {
+        params: { telegramUserId },
+    });
+
+    return response.data;
 };
 
-export const uploadFileApi = async (file: File, telegramUserId: number): Promise<FileMetadata> => {
+export const uploadFileApi = async (
+    file: File,
+    telegramUserId: number
+): Promise<FileMetadata> => {
     const formData = new FormData();
     formData.append('file', file);
     formData.append('telegramUserId', telegramUserId.toString());
 
-    const response = await fetch(`${API_BASE_URL}/upload`, {
-        method: 'POST',
-        body: formData,
-    });
+    const response = await axios.post(
+        `${API_BASE_URL}/files/upload`,
+        formData
+    );
 
-    if (!response.ok) throw new Error('Failed to upload file');
-    return response.json();
+    return response.data;
 };

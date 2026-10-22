@@ -24,19 +24,16 @@ export default function App() {
   const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [uploading, setUploading] = useState(false);
 
-  // Extract Telegram User ID, fallback to 12345 for browser testing
-  const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 12345678; // fallback for browser testing
-
-  fetch(`https://canola-deacon-occultist.ngrok-free.dev/api/files?telegramUserId=${telegramUserId}`)
-      .then(res => res.json())
-      .then(data => setFiles(data));
+  // Extract Telegram User ID, fallback to your actual ID or testing ID if needed
+  const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 1524926268;
 
   const loadFiles = async () => {
     try {
+      console.log("Fetching files for Telegram User ID:", telegramUserId);
       const data = await fetchUserFiles(telegramUserId);
       setFiles(data);
     } catch (err) {
-      console.error(err);
+      console.error("Failed to load files:", err);
     }
   };
 
