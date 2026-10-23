@@ -1,1 +1,27 @@
 [2026-10-22T13:13:04.739Z] INFO  [EnsureGlobalDaemon] [trace=4edfb06acf389a07ffba64a3927ea4e5] spawned global daemon ensure helper (pid 9381)
+[2026-10-23T11:27:14.280Z] INFO  [McpProxy] [trace=719b9d4567a1ad02f4ff34d7f6b35276] Spawned MCP daemon (pid 28653) for /home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-23T11:27:14.563Z] INFO  [StorageFactory] [trace=e4bcfe410ca1e85e4a9a520a4b34f5a3] ignoring retired storageMode=null — routing is decided by the cutover state
+[2026-10-23T11:27:14.583Z] INFO  [StorageFactory] [trace=e4bcfe410ca1e85e4a9a520a4b34f5a3] StorageFactory.create: route=uncutover, projectPath=/home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-23T11:27:14.592Z] INFO  [McpServer] [trace=e4bcfe410ca1e85e4a9a520a4b34f5a3] MCP runtime ready: 10/10 built-in (insideRepo=true) + 0 platform tool(s), gate=open, manifest=fetch-failed
+[2026-10-23T11:27:14.593Z] INFO  [McpDaemon] [trace=e4bcfe410ca1e85e4a9a520a4b34f5a3] MCP daemon listening on /tmp/github-copilot-sXR4eO/.jolli-mcp-1000/af5551be0af5e1ac.sock (cwd=/home/nurmuxammad/Documents/PDF DOCS OPENER MAIN, version=0.99.18)
+[2026-10-23T11:27:14.687Z] INFO  [McpProxy] [trace=719b9d4567a1ad02f4ff34d7f6b35276] Attached to MCP daemon 28653 (v0.99.18) for /home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-23T11:27:14.689Z] INFO  [McpServer] [trace=e4bcfe410ca1e85e4a9a520a4b34f5a3] MCP runtime ready: 10/10 built-in (insideRepo=true) + 0 platform tool(s), gate=open, manifest=fetch-failed
+[2026-10-23T11:27:14.718Z] INFO  [McpServer] MCP client connected: copilot-cli/1.0.85 (unmapped — candidate for CLIENTINFO_AGENTS)
+[2026-10-23T12:09:57.303Z] INFO  [McpProxy] [trace=da45365b983d04fa4758ba632740c678] Spawned MCP daemon (pid 34054) for /home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-23T12:09:57.505Z] INFO  [StorageFactory] [trace=57454cec57a25fe94aafe38a1bf41592] ignoring retired storageMode=null — routing is decided by the cutover state
+[2026-10-23T12:09:57.516Z] INFO  [StorageFactory] [trace=57454cec57a25fe94aafe38a1bf41592] StorageFactory.create: route=uncutover, projectPath=/home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-23T12:09:57.525Z] INFO  [McpServer] [trace=57454cec57a25fe94aafe38a1bf41592] MCP runtime ready: 10/10 built-in (insideRepo=true) + 0 platform tool(s), gate=open, manifest=fetch-failed
+[2026-10-23T12:09:57.527Z] INFO  [McpDaemon] [trace=57454cec57a25fe94aafe38a1bf41592] MCP daemon listening on /tmp/github-copilot-O5j9y0/.jolli-mcp-1000/af5551be0af5e1ac.sock (cwd=/home/nurmuxammad/Documents/PDF DOCS OPENER MAIN, version=0.99.18)
+[2026-10-23T12:09:57.606Z] INFO  [McpProxy] [trace=da45365b983d04fa4758ba632740c678] Attached to MCP daemon 34054 (v0.99.18) for /home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-23T12:09:57.607Z] INFO  [McpServer] [trace=57454cec57a25fe94aafe38a1bf41592] MCP runtime ready: 10/10 built-in (insideRepo=true) + 0 platform tool(s), gate=open, manifest=fetch-failed
+[2026-10-23T12:09:57.620Z] INFO  [McpServer] MCP client connected: copilot-cli/1.0.85 (unmapped — candidate for CLIENTINFO_AGENTS)
+[2026-10-23T14:21:07.285Z] INFO  [McpProxy] [trace=81b7e5135e4b61f7ea8239ddb6a18174] Spawned MCP daemon (pid 51150) for /home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-23T14:21:07.501Z] INFO  [UpdateCheck] [trace=c9493fb2e9c29d9787c6295719b92417] Spawned detached update-check refresh (PID: 51163)
+[2026-10-23T14:21:07.509Z] INFO  [StorageFactory] [trace=c9493fb2e9c29d9787c6295719b92417] ignoring retired storageMode=null — routing is decided by the cutover state
+[2026-10-23T14:21:07.522Z] INFO  [StorageFactory] [trace=c9493fb2e9c29d9787c6295719b92417] StorageFactory.create: route=uncutover, projectPath=/home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-23T14:21:07.535Z] INFO  [McpServer] [trace=c9493fb2e9c29d9787c6295719b92417] MCP runtime ready: 10/10 built-in (insideRepo=true) + 0 platform tool(s), gate=open, manifest=fetch-failed
+[2026-10-23T14:21:07.537Z] INFO  [McpDaemon] [trace=c9493fb2e9c29d9787c6295719b92417] MCP daemon listening on /tmp/github-copilot-3Q1BCM/.jolli-mcp-1000/af5551be0af5e1ac.sock (cwd=/home/nurmuxammad/Documents/PDF DOCS OPENER MAIN, version=0.99.18)
+[2026-10-23T14:21:07.590Z] INFO  [McpProxy] [trace=81b7e5135e4b61f7ea8239ddb6a18174] Attached to MCP daemon 51150 (v0.99.18) for /home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-23T14:21:07.591Z] INFO  [McpServer] [trace=c9493fb2e9c29d9787c6295719b92417] MCP runtime ready: 10/10 built-in (insideRepo=true) + 0 platform tool(s), gate=open, manifest=fetch-failed
+[2026-10-23T14:21:07.603Z] INFO  [McpServer] MCP client connected: copilot-cli/1.0.85 (unmapped — candidate for CLIENTINFO_AGENTS)
+[2026-10-23T14:21:10.391Z] INFO  [EnsureGlobalDaemon] [trace=b34e319fe08377b6181aca874729739f] spawned global daemon ensure helper (pid 51195)

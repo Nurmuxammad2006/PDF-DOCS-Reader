@@ -14,20 +14,14 @@ import org.telegram.telegrambots.meta.api.objects.replykeyboard.buttons.InlineKe
 import org.telegram.telegrambots.meta.api.objects.webapp.WebAppInfo;
 import org.telegram.telegrambots.meta.exceptions.TelegramApiException;
 
-import java.io.File;
-import java.io.InputStream;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
 import java.util.List;
 
 @Service
 public class TelegramBotService extends TelegramLongPollingBot {
 
     private final FileMetadataRepository repository;
-    private static final String UPLOAD_DIR = "uploads/";
 
     @Value("${telegram.bot.username}")
     private String botUsername;
@@ -54,19 +48,13 @@ public class TelegramBotService extends TelegramLongPollingBot {
                 GetFile getFileMethod = new GetFile(document.getFileId());
                 org.telegram.telegrambots.meta.api.objects.File tgFile = execute(getFileMethod);
 
-                // Download file locally
-                String fileUrl = tgFile.getFileUrl(getBotToken());
-                File directory = new File(UPLOAD_DIR);
-                if (!directory.exists()) directory.mkdirs();
-
-                Path destinationPath = Paths.get(UPLOAD_DIR + document.getFileName());
-                try (InputStream in = new URL(fileUrl).openStream()) {
-                    Files.copy(in, destinationPath, StandardCopyOption.REPLACE_EXISTING);
-                }
+                Path destinationPath = UploadPathResolver.resolve(document.getFileName());
+                Files.createDirectories(UploadPathResolver.uploadDirectory());
+                downloadFile(tgFile, destinationPath.toFile());
 
                 // Save metadata to database
                 FileMetadata metadata = new FileMetadata();
-                metadata.setFilename(document.getFileName());
+                metadata.setFilename(destinationPath.getFileName().toString());
                 metadata.setFileType(document.getMimeType());
                 metadata.setFileSize(document.getFileSize());
                 metadata.setTelegramUserId(userId);
