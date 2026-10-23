@@ -4,40 +4,60 @@ import com.example.pdfdocsopener.entity.FileMetadata;
 import com.example.pdfdocsopener.repository.FileMetadataRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
-import java.io.File;
+
 import java.io.IOException;
+import java.io.InputStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
-import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class FileService {
 
-    private static final String UPLOAD_DIR = "uploads/";
     private final FileMetadataRepository repository;
 
     public FileService(FileMetadataRepository repository) {
         this.repository = repository;
     }
 
-    public FileMetadata saveFile(MultipartFile file, Long telegramUserId) throws IOException {
-        File directory = new File(UPLOAD_DIR);
-        if (!directory.exists()) directory.mkdirs();
+    public List<FileMetadata> getFilesByUser(Long telegramUserId) {
+        return repository.findByTelegramUserId(telegramUserId);
+    }
 
-        Path filePath = Paths.get(UPLOAD_DIR + file.getOriginalFilename());
-        Files.write(filePath, file.getBytes());
+    public FileMetadata saveFile(MultipartFile file, Long telegramUserId) throws IOException {
+        String originalFilename = file.getOriginalFilename();
+        Path destinationPath = UploadPathResolver.resolve(originalFilename);
+
+        Files.createDirectories(UploadPathResolver.uploadDirectory());
+
+        try (InputStream inputStream = file.getInputStream()) {
+            Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+        }
 
         FileMetadata metadata = new FileMetadata();
-        metadata.setFilename(file.getOriginalFilename());
+        metadata.setFilename(destinationPath.getFileName().toString());
         metadata.setFileType(file.getContentType());
         metadata.setFileSize(file.getSize());
         metadata.setTelegramUserId(telegramUserId);
+        metadata.setUploadedAt(LocalDateTime.now());
 
         return repository.save(metadata);
     }
 
-    public List<FileMetadata> getFilesByUser(Long telegramUserId) {
-        return repository.findByTelegramUserId(telegramUserId);
+    public boolean deleteFile(Long id) throws IOException {
+        Optional<FileMetadata> optionalFile = repository.findById(id);
+        if (optionalFile.isPresent()) {
+            FileMetadata fileMetadata = optionalFile.get();
+
+            Path filePath = UploadPathResolver.resolve(fileMetadata.getFilename());
+            Files.deleteIfExists(filePath);
+
+            repository.delete(fileMetadata);
+            return true;
+        }
+        return false;
     }
 }
