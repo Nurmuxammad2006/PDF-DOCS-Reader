@@ -1,7 +1,16 @@
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import { fetchUserFiles, uploadFileApi } from './services/api';
-import type { FileMetadata } from './types/file';
+import type { FileMetadata, TabType } from './types/file';
+import { BottomNav } from './components/BottomNav';
+import { HomePage } from './pages/HomePage';
+import { FilesPage } from './pages/FilesPage';
+import { SettingsPage } from './pages/SettingsPage';
+import { ActionSheet } from './components/ActionSheet';
 import './index.css';
+
+const ViewerPage = lazy(() =>
+  import('./pages/ViewerPage').then(({ ViewerPage: page }) => ({ default: page })),
+);
 
 declare global {
   interface Window {
@@ -19,28 +28,39 @@ declare global {
 }
 
 export default function App() {
+  const [currentTab, setCurrentTab] = useState<TabType>('files');
   const [files, setFiles] = useState<FileMetadata[]>([]);
-  const [selectedFile, setSelectedFile] = useState<File | null>(null);
-  const [uploading, setUploading] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [activeFile, setActiveFile] = useState<FileMetadata | null>(null);
+  const [viewingFile, setViewingFile] = useState<FileMetadata | null>(null);
 
-  // Extract Telegram User ID, default to testing ID if missing
   const telegramUserId = window.Telegram?.WebApp?.initDataUnsafe?.user?.id || 1524926268;
 
   const loadFiles = async () => {
     try {
       setLoading(true);
       const data = await fetchUserFiles(telegramUserId);
-      if (Array.isArray(data)) {
-        setFiles(data);
-      } else {
-        setFiles([]);
-      }
+      setFiles(Array.isArray(data) ? data : []);
     } catch (err) {
       console.error("Failed to load files:", err);
-      setFiles([]); // Graceful fallback so UI doesn't crash
+      setFiles([]);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleUploadFile = async (file: File) => {
+    try {
+      setUploading(true);
+      await uploadFileApi(file, telegramUserId);
+      await loadFiles();
+      alert('File uploaded successfully!');
+    } catch (err) {
+      console.error("Upload error:", err);
+      alert('Failed to upload file.');
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -53,64 +73,59 @@ export default function App() {
     loadFiles();
   }, []);
 
-  const handleUpload = async () => {
-    if (!selectedFile) return alert('Please choose a file first!');
-    setUploading(true);
-    try {
-      await uploadFileApi(selectedFile, telegramUserId);
-      setSelectedFile(null);
-      await loadFiles();
-      alert('File uploaded successfully!');
-    } catch (err) {
-      alert('Upload failed.');
-    } finally {
-      setUploading(false);
-    }
-  };
+  // 🛑 STOP HERE IF VIEWING A FILE: This completely replaces the screen
+  if (viewingFile) {
+    return (
+        <div style={{
+          position: 'fixed',
+          top: 0,
+          left: 0,
+          width: '100vw',
+          height: '100vh',
+          backgroundColor: '#ffffff',
+          zIndex: 99999,
+          display: 'flex',
+          flexDirection: 'column',
+          overflow: 'hidden'
+        }}>
+          <Suspense fallback={<div className="ios-viewer-loading">Loading document viewer…</div>}>
+            <ViewerPage
+                file={viewingFile}
+                onClose={() => setViewingFile(null)}
+            />
+          </Suspense>
+        </div>
+    );
+  }
 
   return (
       <div className="ios-container">
-        <div className="ios-header">Document Reader</div>
+        {currentTab === 'home' && (
+            <HomePage onNavigate={setCurrentTab} fileCount={files.length} />
+        )}
 
-        <div className="ios-card">
-          <h3 style={{ marginTop: 0, fontSize: '18px', fontWeight: 600 }}>Upload New File</h3>
-          <input
-              type="file"
-              style={{ margin: '10px 0', fontSize: '14px', width: '100%' }}
-              onChange={(e) => setSelectedFile(e.target.files?.[0] || null)}
-          />
-          <button className="ios-button" onClick={handleUpload} disabled={uploading}>
-            {uploading ? 'Uploading...' : 'Upload Document'}
-          </button>
-        </div>
+        {currentTab === 'files' && (
+            <FilesPage
+                files={files}
+                loading={loading}
+                onOpenFile={(file) => setActiveFile(file)}
+                onUploadFile={handleUploadFile}
+                uploading={uploading}
+            />
+        )}
 
-        <div className="ios-card">
-          <h3 style={{ marginTop: 0, fontSize: '18px', fontWeight: 600 }}>Your Files</h3>
-          {loading ? (
-              <p style={{ color: '#8e8e93', margin: '10px 0', fontSize: '15px' }}>Loading documents...</p>
-          ) : files.length === 0 ? (
-              <p style={{ color: '#8e8e93', margin: '10px 0', fontSize: '15px' }}>No documents uploaded yet.</p>
-          ) : (
-              <div>
-                {files.map((file) => (
-                    <div key={file.id} className="ios-file-item">
-                      <div className="ios-file-info">
-                        <span className="ios-file-name">📄 {file.filename}</span>
-                        <span className="ios-file-meta">
-                    {Math.round(file.fileSize / 1024)} KB
-                  </span>
-                      </div>
-                      <button
-                          style={{ background: 'none', border: 'none', color: '#007aff', fontWeight: 600, fontSize: '14px', cursor: 'pointer' }}
-                          onClick={() => alert(`Opening ${file.filename}...`)}
-                      >
-                        Open
-                      </button>
-                    </div>
-                ))}
-              </div>
-          )}
-        </div>
+        {currentTab === 'settings' && (
+            <SettingsPage telegramUserId={telegramUserId} />
+        )}
+
+        <ActionSheet
+            file={activeFile}
+            onClose={() => setActiveFile(null)}
+            onOpen={(file) => setViewingFile(file)}
+            onDeleted={() => loadFiles()}
+        />
+
+        <BottomNav currentTab={currentTab} onTabChange={setCurrentTab} />
       </div>
   );
 }

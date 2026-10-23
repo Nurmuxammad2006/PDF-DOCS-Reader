@@ -6,6 +6,16 @@ export default defineConfig({
   server: {
     host: true,
     port: 5173,
+    proxy: {
+      '/api': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+      '/uploads': {
+        target: 'http://localhost:8080',
+        changeOrigin: true,
+      },
+    },
     allowedHosts: [
       'canola-deacon-occultist.ngrok-free.dev',
       '.ngrok-free.dev' // This allows any ngrok subdomain automatically

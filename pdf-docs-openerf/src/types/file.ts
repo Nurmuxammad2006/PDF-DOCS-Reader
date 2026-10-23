@@ -4,5 +4,7 @@ export interface FileMetadata {
     fileType: string;
     fileSize: number;
     telegramUserId: number;
-    uploadedAt: string;
+    uploadedAt?: string;
 }
+
+export type TabType = 'home' | 'files' | 'settings';
