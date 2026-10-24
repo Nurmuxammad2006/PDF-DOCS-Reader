@@ -9,7 +9,7 @@ import { ActionSheet } from './components/ActionSheet';
 import './index.css';
 
 const ViewerPage = lazy(() =>
-  import('./pages/ViewerPage').then(({ ViewerPage: page }) => ({ default: page })),
+    import('./pages/ViewerPage').then(({ ViewerPage: page }) => ({ default: page })),
 );
 
 declare global {
@@ -64,6 +64,13 @@ export default function App() {
     }
   };
 
+  const handleFileRenamed = async (updatedFile: FileMetadata) => {
+    setFiles((currentFiles) =>
+        currentFiles.map((file) => (file.id === updatedFile.id ? updatedFile : file)),
+    );
+    await loadFiles(); // Reload to keep state fresh
+  };
+
   useEffect(() => {
     try {
       window.Telegram?.WebApp?.expand?.();
@@ -76,18 +83,20 @@ export default function App() {
   // 🛑 STOP HERE IF VIEWING A FILE: This completely replaces the screen
   if (viewingFile) {
     return (
-        <div style={{
-          position: 'fixed',
-          top: 0,
-          left: 0,
-          width: '100vw',
-          height: '100vh',
-          backgroundColor: '#ffffff',
-          zIndex: 99999,
-          display: 'flex',
-          flexDirection: 'column',
-          overflow: 'hidden'
-        }}>
+        <div
+            style={{
+              position: 'fixed',
+              top: 0,
+              left: 0,
+              width: '100vw',
+              height: '100vh',
+              backgroundColor: '#ffffff',
+              zIndex: 99999,
+              display: 'flex',
+              flexDirection: 'column',
+              overflow: 'hidden',
+            }}
+        >
           <Suspense fallback={<div className="ios-viewer-loading">Loading document viewer…</div>}>
             <ViewerPage
                 file={viewingFile}
@@ -123,6 +132,7 @@ export default function App() {
             onClose={() => setActiveFile(null)}
             onOpen={(file) => setViewingFile(file)}
             onDeleted={() => loadFiles()}
+            onRenamed={handleFileRenamed}
         />
 
         <BottomNav currentTab={currentTab} onTabChange={setCurrentTab} />

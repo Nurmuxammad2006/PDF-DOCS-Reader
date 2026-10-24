@@ -430,6 +430,95 @@ body {
   cursor: pointer;
 }
 
+.ios-rename-dialog {
+  width: calc(100% - 48px);
+  max-width: 420px;
+  margin: auto;
+  padding: 22px;
+  box-sizing: border-box;
+  background: #ffffff;
+  border-radius: 16px;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2);
+}
+
+.ios-rename-title {
+  margin: 0;
+  font-size: 20px;
+  font-weight: 700;
+  text-align: center;
+}
+
+.ios-rename-description {
+  margin: 8px 0 18px;
+  color: #636366;
+  font-size: 14px;
+  text-align: center;
+}
+
+.ios-rename-input-row {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 0 12px;
+  background: #f2f2f7;
+  border: 1px solid #d1d1d6;
+  border-radius: 10px;
+}
+
+.ios-rename-input {
+  min-width: 0;
+  flex: 1;
+  padding: 12px 0;
+  background: transparent;
+  border: 0;
+  outline: none;
+  color: #000000;
+  font: inherit;
+  font-size: 16px;
+}
+
+.ios-rename-extension {
+  color: #8e8e93;
+  font-size: 15px;
+}
+
+.ios-rename-error {
+  margin: 10px 0 0;
+  color: #d70015;
+  font-size: 13px;
+}
+
+.ios-rename-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 18px;
+}
+
+.ios-rename-actions button {
+  flex: 1;
+  padding: 12px;
+  border: 0;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.ios-rename-cancel {
+  background: #f2f2f7;
+  color: #007aff;
+}
+
+.ios-rename-save {
+  background: #007aff;
+  color: #ffffff;
+}
+
+.ios-rename-actions button:disabled {
+  cursor: default;
+  opacity: 0.5;
+}
+
 /* Fullscreen Viewer View */
 .ios-viewer-container {
   position: fixed;

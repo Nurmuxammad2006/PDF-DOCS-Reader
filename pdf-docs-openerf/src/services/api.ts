@@ -52,3 +52,16 @@ export const uploadFileApi = async (
 export const deleteFileApi = async (fileId: number): Promise<void> => {
     await apiClient.delete(`/files/${fileId}`);
 };
+
+/**
+ * Rename a file by its ID
+ */
+export const renameFileApi = async (
+    fileId: number,
+    newFilename: string
+): Promise<FileMetadata> => {
+    const response = await apiClient.put<FileMetadata>(
+        `/files/${fileId}/rename?newFilename=${encodeURIComponent(newFilename)}`
+    );
+    return response.data;
+};

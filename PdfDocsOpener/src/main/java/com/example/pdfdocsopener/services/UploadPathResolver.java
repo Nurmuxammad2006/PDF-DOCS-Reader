@@ -18,19 +18,19 @@ final class UploadPathResolver {
 
     static Path resolve(String filename) throws IOException {
         if (filename == null || filename.isBlank()) {
-            throw new IOException("Filename cannot be null or blank");
+            throw new InvalidFilenameException("Filename cannot be blank");
         }
 
         if (filename.equals(".") || filename.equals("..")
                 || filename.indexOf('/') >= 0 || filename.indexOf('\\') >= 0
                 || filename.getBytes(StandardCharsets.UTF_8).length > 255
                 || filename.chars().anyMatch(Character::isISOControl)) {
-            throw new IOException("Invalid filename provided");
+            throw new InvalidFilenameException("Filename contains invalid characters or is too long");
         }
 
         Path resolvedPath = UPLOAD_DIR.resolve(filename).normalize();
         if (!resolvedPath.startsWith(UPLOAD_DIR)) {
-            throw new IOException("File path must stay inside the uploads directory");
+            throw new InvalidFilenameException("File path must stay inside the uploads directory");
         }
         return resolvedPath;
     }

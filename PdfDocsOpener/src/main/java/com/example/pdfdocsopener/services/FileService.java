@@ -5,6 +5,7 @@ import com.example.pdfdocsopener.repository.FileMetadataRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Files;
@@ -59,5 +60,46 @@ public class FileService {
             return true;
         }
         return false;
+    }
+
+    public FileMetadata renameFile(Long id, String newFilename) throws IOException {
+        Optional<FileMetadata> optionalFile = repository.findById(id);
+        if (optionalFile.isEmpty()) {
+            throw new FileNotFoundException("File not found");
+        }
+
+        FileMetadata fileMetadata = optionalFile.get();
+        Path oldPath = UploadPathResolver.resolve(fileMetadata.getFilename());
+        String requestedName = newFilename == null ? null : newFilename.trim();
+        String oldFilename = oldPath.getFileName().toString();
+        int extensionIndex = oldFilename.lastIndexOf('.');
+        String extension = extensionIndex > 0 ? oldFilename.substring(extensionIndex) : "";
+        if (extensionIndex > 0 && requestedName != null
+                && requestedName.toLowerCase().endsWith(extension.toLowerCase())) {
+            requestedName = requestedName.substring(0, requestedName.length() - extension.length());
+        }
+        Path newPath = UploadPathResolver.resolve(
+                requestedName == null ? null : requestedName + extension
+        );
+
+        if (oldPath.equals(newPath)) {
+            return fileMetadata;
+        }
+        if (!Files.isRegularFile(oldPath)) {
+            throw new FileNotFoundException("File not found on disk");
+        }
+
+        Files.move(oldPath, newPath);
+        fileMetadata.setFilename(newPath.getFileName().toString());
+        try {
+            return repository.save(fileMetadata);
+        } catch (RuntimeException persistenceError) {
+            try {
+                Files.move(newPath, oldPath);
+            } catch (IOException rollbackError) {
+                persistenceError.addSuppressed(rollbackError);
+            }
+            throw persistenceError;
+        }
     }
 }
