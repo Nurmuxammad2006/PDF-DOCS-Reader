@@ -9,12 +9,32 @@ interface FilesPageProps {
     uploading: boolean;
 }
 
+const getFileBadge = (filename: string) => {
+    const ext = filename.split('.').pop()?.toLowerCase();
+
+    switch (ext) {
+        case 'pdf':
+            return { label: 'PDF', bg: '#FF3B30' }; // iOS Red
+        case 'doc':
+        case 'docx':
+            return { label: 'DOC', bg: '#007AFF' }; // iOS Blue
+        case 'xls':
+        case 'xlsx':
+            return { label: 'XLS', bg: '#34C759' }; // iOS Green
+        case 'ppt':
+        case 'pptx':
+            return { label: 'PPT', bg: '#FF9500' }; // iOS Orange
+        default:
+            return { label: 'FILE', bg: '#8E8E93' }; // iOS Gray
+    }
+};
+
 export const FilesPage: React.FC<FilesPageProps> = ({
                                                         files,
                                                         loading,
                                                         onOpenFile,
                                                         onUploadFile,
-                                                        uploading
+                                                        uploading,
                                                     }) => {
     const [search, setSearch] = useState('');
     const [activeFilter, setActiveFilter] = useState('All');
@@ -32,7 +52,7 @@ export const FilesPage: React.FC<FilesPageProps> = ({
         setSelectedFile(null);
     };
 
-    const filteredFiles = files.filter(file => {
+    const filteredFiles = files.filter((file) => {
         const matchesSearch = file.filename.toLowerCase().includes(search.toLowerCase());
         if (activeFilter === 'PDF') return matchesSearch && file.filename.toLowerCase().endsWith('.pdf');
         if (activeFilter === 'Documents') return matchesSearch && !file.filename.toLowerCase().endsWith('.pdf');
@@ -97,18 +117,31 @@ export const FilesPage: React.FC<FilesPageProps> = ({
                 ) : filteredFiles.length === 0 ? (
                     <p style={{ color: '#8e8e93', padding: '16px 0', margin: 0 }}>No files found.</p>
                 ) : (
-                    filteredFiles.map((file) => (
-                        <div key={file.id} className="ios-file-row" onClick={() => onOpenFile(file)}>
-                            <div className="ios-pdf-icon-badge">PDF</div>
-                            <div className="ios-file-details">
-                                <span className="ios-file-title">{file.filename}</span>
-                                <span className="ios-file-sub">
-                  {Math.round((file.fileSize / 1024 / 1024) * 10) / 10 || 0.1} MB
-                </span>
+                    filteredFiles.map((file) => {
+                        const badge = getFileBadge(file.filename);
+
+                        return (
+                            <div
+                                key={file.id}
+                                className="ios-file-row"
+                                onClick={() => onOpenFile(file)}
+                            >
+                                <div
+                                    className="ios-pdf-icon-badge"
+                                    style={{ backgroundColor: badge.bg }}
+                                >
+                                    {badge.label}
+                                </div>
+                                <div className="ios-file-details">
+                                    <span className="ios-file-title">{file.filename}</span>
+                                    <span className="ios-file-sub">
+                    {Math.round((file.fileSize / 1024 / 1024) * 10) / 10 || 0.1} MB
+                  </span>
+                                </div>
+                                <span className="ios-chevron">›</span>
                             </div>
-                            <span className="ios-chevron">›</span>
-                        </div>
-                    ))
+                        );
+                    })
                 )}
             </div>
         </div>
