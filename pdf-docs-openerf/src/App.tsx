@@ -1,7 +1,7 @@
 import { lazy, Suspense, useEffect, useState } from 'react';
 import { fetchUserFiles, uploadFileApi } from './services/api';
 import type { FileMetadata, TabType } from './types/file';
-import { BottomNav } from './components/BottomNav';
+import { BottomNavBar } from './components/BottomNav';
 import { HomePage } from './pages/HomePage';
 import { FilesPage } from './pages/FilesPage';
 import { SettingsPage } from './pages/SettingsPage';
@@ -135,7 +135,7 @@ export default function App() {
             onRenamed={handleFileRenamed}
         />
 
-        <BottomNav currentTab={currentTab} onTabChange={setCurrentTab} />
+        <BottomNavBar currentTab={currentTab} onTabChange={setCurrentTab} stickyBottom />
       </div>
   );
 }

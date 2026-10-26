@@ -46,3 +46,13 @@
 [2026-10-24T14:52:14.072Z] INFO  [McpProxy] [trace=c13d021c8ade37e14378fa69ffa81748] Attached to MCP daemon 11163 (v0.99.18) for /home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
 [2026-10-24T14:52:14.073Z] INFO  [McpServer] [trace=b3f606757d3b37dddff22008aa2a353f] MCP runtime ready: 10/10 built-in (insideRepo=true) + 0 platform tool(s), gate=open, manifest=fetch-failed
 [2026-10-24T14:52:14.075Z] INFO  [McpServer] MCP client connected: copilot-cli/1.0.85 (unmapped — candidate for CLIENTINFO_AGENTS)
+[2026-10-26T08:17:14.305Z] INFO  [McpProxy] [trace=6b7457ac3ff60cc1bc3a6c9f07cf203f] Spawned MCP daemon (pid 11712) for /home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-26T08:17:14.591Z] INFO  [UpdateCheck] [trace=f9ee43a6021a3aa4e18844cbc4fd1be5] Spawned detached update-check refresh (PID: 11736)
+[2026-10-26T08:17:14.596Z] INFO  [StorageFactory] [trace=f9ee43a6021a3aa4e18844cbc4fd1be5] ignoring retired storageMode=null — routing is decided by the cutover state
+[2026-10-26T08:17:14.612Z] INFO  [StorageFactory] [trace=f9ee43a6021a3aa4e18844cbc4fd1be5] StorageFactory.create: route=uncutover, projectPath=/home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-26T08:17:14.623Z] INFO  [McpServer] [trace=f9ee43a6021a3aa4e18844cbc4fd1be5] MCP runtime ready: 10/10 built-in (insideRepo=true) + 0 platform tool(s), gate=open, manifest=fetch-failed
+[2026-10-26T08:17:14.624Z] INFO  [McpDaemon] [trace=f9ee43a6021a3aa4e18844cbc4fd1be5] MCP daemon listening on /tmp/github-copilot-p1l2Gd/.jolli-mcp-1000/af5551be0af5e1ac.sock (cwd=/home/nurmuxammad/Documents/PDF DOCS OPENER MAIN, version=0.99.18)
+[2026-10-26T08:17:14.710Z] INFO  [McpProxy] [trace=6b7457ac3ff60cc1bc3a6c9f07cf203f] Attached to MCP daemon 11712 (v0.99.18) for /home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-26T08:17:14.711Z] INFO  [McpServer] [trace=f9ee43a6021a3aa4e18844cbc4fd1be5] MCP runtime ready: 10/10 built-in (insideRepo=true) + 0 platform tool(s), gate=open, manifest=fetch-failed
+[2026-10-26T08:17:14.726Z] INFO  [McpServer] MCP client connected: copilot-cli/1.0.94 (unmapped — candidate for CLIENTINFO_AGENTS)
+[2026-10-26T08:17:17.422Z] INFO  [EnsureGlobalDaemon] [trace=965f5e82d99594419e137b201f49fc6b] spawned global daemon ensure helper (pid 11769)
