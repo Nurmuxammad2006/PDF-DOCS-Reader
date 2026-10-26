@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import type { FileMetadata } from '../types/file';
 import { deleteFileApi, renameFileApi } from '../services/api';
+import { Icon } from './Icon';
 
 interface ActionSheetProps {
     file: FileMetadata | null;
@@ -31,6 +32,33 @@ const getFileBadge = (filename: string) => {
     }
 };
 
+const copyTextToClipboard = async (text: string) => {
+    try {
+        if (navigator.clipboard?.writeText) {
+            await navigator.clipboard.writeText(text);
+            return true;
+        }
+    } catch {
+        // Try the selection-based fallback for embedded browsers.
+    }
+
+    const input = document.createElement('textarea');
+    input.value = text;
+    input.setAttribute('readonly', '');
+    input.style.position = 'fixed';
+    input.style.opacity = '0';
+    document.body.appendChild(input);
+    input.select();
+
+    try {
+        return document.execCommand('copy');
+    } catch {
+        return false;
+    } finally {
+        input.remove();
+    }
+};
+
 export const ActionSheet: React.FC<ActionSheetProps> = ({
                                                             file,
                                                             onClose,
@@ -42,11 +70,17 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
     const [newName, setNewName] = useState('');
     const [renameError, setRenameError] = useState('');
     const [renamePending, setRenamePending] = useState(false);
+    const [shareFeedback, setShareFeedback] = useState<{
+        message: string;
+        url: string;
+        isError: boolean;
+    } | null>(null);
 
     useEffect(() => {
         setIsRenaming(false);
         setRenameError('');
         setRenamePending(false);
+        setShareFeedback(null);
     }, [file?.id]);
 
     if (!file) return null;
@@ -85,13 +119,11 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
         setRenameError('');
 
         try {
-            await renameFileApi(file.id, finalName); // Send full name with extension
-
+            await renameFileApi(file.id, finalName);
             onRenamed({
                 ...file,
                 filename: finalName,
             });
-
             onClose();
         } catch (err) {
             console.error('Failed to rename file:', err);
@@ -115,6 +147,34 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
         } finally {
             setRenamePending(false);
         }
+    };
+
+    const handleShare = async () => {
+        const fileUrl = `${window.location.origin}/uploads/${encodeURIComponent(file.filename)}`;
+
+        if (navigator.share) {
+            try {
+                await navigator.share({
+                    title: file.filename,
+                    text: `Check out this document: ${file.filename}`,
+                    url: fileUrl,
+                });
+                onClose();
+                return;
+            } catch (err) {
+                if (err instanceof Error && err.name === 'AbortError') return;
+                console.error('Native sharing failed; trying clipboard fallback:', err);
+            }
+        }
+
+        const copied = await copyTextToClipboard(fileUrl);
+        setShareFeedback({
+            message: copied
+                ? 'Link copied. Paste it into a chat to share this file.'
+                : 'Could not copy the link. Select it below and copy it manually.',
+            url: fileUrl,
+            isError: !copied,
+        });
     };
 
     return (
@@ -196,7 +256,11 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
                                 onClose();
                             }}
                         >
-                            <span>👁️ Open</span>
+                            <span className="ios-sheet-action"><Icon name="open" />Open</span>
+                        </button>
+
+                        <button className="ios-sheet-btn" onClick={handleShare}>
+                            <span className="ios-sheet-action"><Icon name="share" />Share</span>
                         </button>
 
                         <button
@@ -207,13 +271,32 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
                                 setIsRenaming(true);
                             }}
                         >
-                            <span>✏️ Rename</span>
+                            <span className="ios-sheet-action"><Icon name="edit" />Rename</span>
                         </button>
 
                         <button className="ios-sheet-btn danger" onClick={handleDelete}>
-                            <span>🗑️ Delete</span>
+                            <span className="ios-sheet-action"><Icon name="trash" />Delete</span>
                         </button>
                     </div>
+
+                    {shareFeedback && (
+                        <div
+                            className={`ios-share-feedback${shareFeedback.isError ? ' is-error' : ''}`}
+                            role={shareFeedback.isError ? 'alert' : 'status'}
+                        >
+                            <p>{shareFeedback.message}</p>
+                            {shareFeedback.isError && (
+                                <input
+                                    className="ios-share-link"
+                                    type="url"
+                                    value={shareFeedback.url}
+                                    readOnly
+                                    onFocus={(event) => event.currentTarget.select()}
+                                    aria-label="File sharing link"
+                                />
+                            )}
+                        </div>
+                    )}
 
                     <button className="ios-sheet-cancel" onClick={onClose}>
                         Cancel

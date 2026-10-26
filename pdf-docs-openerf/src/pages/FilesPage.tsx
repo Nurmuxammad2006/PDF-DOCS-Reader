@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import type { FileMetadata } from '../types/file';
+import { Icon } from '../components/Icon';
 
 interface FilesPageProps {
     files: FileMetadata[];
@@ -87,7 +88,7 @@ export const FilesPage: React.FC<FilesPageProps> = ({
 
             {/* Search Input */}
             <div className="ios-search-container">
-                <span className="ios-search-icon">🔍</span>
+                <span className="ios-search-icon"><Icon name="search" size={18} /></span>
                 <input
                     type="text"
                     className="ios-search-input"
@@ -138,7 +139,7 @@ export const FilesPage: React.FC<FilesPageProps> = ({
                     {Math.round((file.fileSize / 1024 / 1024) * 10) / 10 || 0.1} MB
                   </span>
                                 </div>
-                                <span className="ios-chevron">›</span>
+                                <span className="ios-chevron"><Icon name="chevron" size={18} /></span>
                             </div>
                         );
                     })

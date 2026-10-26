@@ -3,6 +3,7 @@ import DOMPurify from 'dompurify';
 import mammoth from 'mammoth';
 import { Document, Page, pdfjs } from 'react-pdf';
 import type { FileMetadata } from '../types/file';
+import { Icon } from '../components/Icon';
 import 'react-pdf/dist/Page/AnnotationLayer.css';
 import 'react-pdf/dist/Page/TextLayer.css';
 
@@ -124,7 +125,9 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ file, onClose }) => {
             {Math.round((file.fileSize / 1024 / 1024) * 10) / 10 || 0.1} MB
           </span>
                 </div>
-                <button className="ios-more-btn">•••</button>
+                <button className="ios-more-btn" type="button" aria-label="More options">
+                    <Icon name="more" />
+                </button>
             </div>
 
             {/* Embedded Document View */}
@@ -164,7 +167,7 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ file, onClose }) => {
                     </div>
                 ) : (
                     <div className="ios-doc-placeholder">
-                        <div style={{ fontSize: '64px', marginBottom: '16px' }}>📝</div>
+                        <div className="ios-doc-placeholder-icon"><Icon name="document" size={64} /></div>
                         <h3>{file.filename}</h3>
                         <p>In-app preview supports PDF and DOCX files. Download this file to open it.</p>
                         <a
@@ -182,7 +185,7 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ file, onClose }) => {
             {/* Bottom Viewer Toolbar */}
             <div className="ios-viewer-toolbar">
                 <button className="ios-tool-btn" onClick={() => window.open(fileUrl, '_blank')}>
-                    <span>📥</span>
+                    <Icon name="download" />
                     <label>Download</label>
                 </button>
                 {(isPdf || isDocx) && (
@@ -193,7 +196,7 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ file, onClose }) => {
                             disabled={zoom <= 1}
                             onClick={() => setZoom(zoom - 0.25)}
                         >
-                            <span>−</span>
+                            <Icon name="zoomOut" />
                             <label>Zoom out</label>
                         </button>
                         <span className="ios-zoom-level">{Math.round(zoom * 100)}%</span>
@@ -203,17 +206,17 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ file, onClose }) => {
                             disabled={zoom >= 4}
                             onClick={() => setZoom(zoom + 0.25)}
                         >
-                            <span>+</span>
+                            <Icon name="zoomIn" />
                             <label>Zoom in</label>
                         </button>
                     </div>
                 )}
                 <button className="ios-tool-btn" onClick={() => alert('Sharing options')}>
-                    <span>📤</span>
+                    <Icon name="share" />
                     <label>Share</label>
                 </button>
                 <button className="ios-tool-btn" onClick={() => alert('Searching within document...')}>
-                    <span>🔍</span>
+                    <Icon name="search" />
                     <label>Search</label>
                 </button>
             </div>
