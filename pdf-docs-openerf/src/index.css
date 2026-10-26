@@ -443,30 +443,42 @@ body {
 
 /* ========== MODAL / ACTION SHEET / VIEWER ========== */
 
-/* Modal Overlay */
+/* Modal Overlay - Smooth Fade In */
 .ios-modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.4);
-  z-index: 2000;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
-  flex-direction: column;
-  justify-content: flex-end;
+  justify-content: center;
+  align-items: flex-end;
+  z-index: 9999;
+  opacity: 0;
+  animation: fadeInOverlay 0.25s ease-out forwards;
 }
 
-/* Action Sheet Container */
+@keyframes fadeInOverlay {
+  to {
+    opacity: 1;
+  }
+}
+
+/* Action Sheet - Smooth Slide Up */
 .ios-action-sheet {
-  background: #f2f2f7;
-  border-top-left-radius: 16px;
-  border-top-right-radius: 16px;
-  padding: 16px;
-  max-width: 500px;
-  margin: 0 auto;
   width: 100%;
+  max-width: 500px;
+  background: #f2f2f7;
+  border-top-left-radius: 20px;
+  border-top-right-radius: 20px;
+  padding: 16px;
   box-sizing: border-box;
+  transform: translateY(100%);
+  animation: slideUpSheet 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpSheet {
+  to {
+    transform: translateY(0);
+  }
 }
 
 .ios-sheet-header {
