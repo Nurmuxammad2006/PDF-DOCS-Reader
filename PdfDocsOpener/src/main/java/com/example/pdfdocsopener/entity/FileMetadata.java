@@ -12,7 +12,6 @@ import java.time.LocalDateTime;
 @Table(name = "file_meta_data")
 public class FileMetadata {
 
-    // Getters and Setters
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

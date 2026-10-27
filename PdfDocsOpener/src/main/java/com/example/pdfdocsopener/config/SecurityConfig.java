@@ -25,6 +25,7 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Allow all requests to /api/files/** endpoints (upload and fetch) without authentication
                         .requestMatchers("/api/files/**").permitAll()
+                        .requestMatchers("/api/settings/**").permitAll()
                         // Uploaded documents are served to the file viewer
                         .requestMatchers("/uploads/**").permitAll()
                         // Any other requests require authentication (if any)

@@ -441,6 +441,62 @@ body {
   font-size: 15px;
 }
 
+.ios-settings-notifications {
+  border-bottom: 0;
+  padding-bottom: 8px;
+}
+
+.ios-toggle {
+  width: 51px;
+  height: 31px;
+  padding: 2px;
+  border: 0;
+  border-radius: 999px;
+  background: #e5e5ea;
+  cursor: pointer;
+  transition: background-color 180ms ease;
+}
+
+.ios-toggle.is-on {
+  background: #34c759;
+}
+
+.ios-toggle:disabled {
+  cursor: default;
+  opacity: 0.6;
+}
+
+.ios-toggle:focus-visible {
+  outline: 2px solid #007aff;
+  outline-offset: 2px;
+}
+
+.ios-toggle-thumb {
+  display: block;
+  width: 27px;
+  height: 27px;
+  border-radius: 50%;
+  background: #ffffff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+  transition: transform 180ms ease;
+}
+
+.ios-toggle.is-on .ios-toggle-thumb {
+  transform: translateX(20px);
+}
+
+.ios-settings-hint,
+.ios-settings-error {
+  margin: 0 0 12px;
+  padding-left: 30px;
+  color: #8e8e93;
+  font-size: 12px;
+}
+
+.ios-settings-error {
+  color: #d70015;
+}
+
 /* ========== MODAL / ACTION SHEET / VIEWER ========== */
 
 /* Modal Overlay - Smooth Fade In */

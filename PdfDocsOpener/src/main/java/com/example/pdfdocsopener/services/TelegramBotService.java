@@ -22,13 +22,19 @@ import java.util.List;
 public class TelegramBotService extends TelegramLongPollingBot {
 
     private final FileMetadataRepository repository;
+    private final TelegramUserPreferenceService preferenceService;
 
     @Value("${telegram.bot.username}")
     private String botUsername;
 
-    public TelegramBotService(@Value("${telegram.bot.token}") String botToken, FileMetadataRepository repository) {
+    public TelegramBotService(
+            @Value("${telegram.bot.token}") String botToken,
+            FileMetadataRepository repository,
+            TelegramUserPreferenceService preferenceService
+    ) {
         super(botToken);
         this.repository = repository;
+        this.preferenceService = preferenceService;
     }
 
     @Override
@@ -60,8 +66,9 @@ public class TelegramBotService extends TelegramLongPollingBot {
                 metadata.setTelegramUserId(userId);
                 repository.save(metadata);
 
-                // Send reply with Mini App Open Button
-                sendSuccessMessage(message.getChatId(), document.getFileName());
+                if (preferenceService.areDocumentNotificationsEnabled(userId)) {
+                    sendSuccessMessage(message.getChatId(), document.getFileName());
+                }
 
             } catch (Exception e) {
                 e.printStackTrace();

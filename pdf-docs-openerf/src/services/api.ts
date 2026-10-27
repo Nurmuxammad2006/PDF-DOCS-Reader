@@ -23,6 +23,27 @@ export const fetchUserFiles = async (
     return response.data;
 };
 
+export const fetchDocumentNotifications = async (
+    telegramUserId: number
+): Promise<boolean> => {
+    const response = await apiClient.get<{ enabled: boolean }>('/settings/notifications', {
+        params: { telegramUserId },
+    });
+    return response.data.enabled;
+};
+
+export const updateDocumentNotifications = async (
+    telegramUserId: number,
+    enabled: boolean
+): Promise<boolean> => {
+    const response = await apiClient.put<{ enabled: boolean }>(
+        '/settings/notifications',
+        { enabled },
+        { params: { telegramUserId } }
+    );
+    return response.data.enabled;
+};
+
 /**
  * Upload a document directly to Spring Boot backend
  */
