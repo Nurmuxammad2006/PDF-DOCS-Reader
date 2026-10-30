@@ -66,3 +66,13 @@
 [2026-10-27T10:59:23.464Z] INFO  [McpServer] [trace=cc9ff3f7e033ef6b3202c96ca8b69a00] MCP runtime ready: 10/10 built-in (insideRepo=true) + 0 platform tool(s), gate=open, manifest=fetch-failed
 [2026-10-27T10:59:23.477Z] INFO  [McpServer] MCP client connected: copilot-cli/1.0.94 (unmapped — candidate for CLIENTINFO_AGENTS)
 [2026-10-27T10:59:28.454Z] INFO  [EnsureGlobalDaemon] [trace=85635cc893e2d0caf97c830beb100931] spawned global daemon ensure helper (pid 11494)
+[2026-10-29T08:54:12.709Z] INFO  [McpProxy] [trace=9d37e551bfa095024109d5c8420affb1] Spawned MCP daemon (pid 12313) for /home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-29T08:54:12.990Z] INFO  [UpdateCheck] [trace=826618cc073bcbafee11b3be32537cb6] Spawned detached update-check refresh (PID: 12337)
+[2026-10-29T08:54:12.995Z] INFO  [StorageFactory] [trace=826618cc073bcbafee11b3be32537cb6] ignoring retired storageMode=null — routing is decided by the cutover state
+[2026-10-29T08:54:13.015Z] INFO  [StorageFactory] [trace=826618cc073bcbafee11b3be32537cb6] StorageFactory.create: route=uncutover, projectPath=/home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-29T08:54:13.025Z] INFO  [McpServer] [trace=826618cc073bcbafee11b3be32537cb6] MCP runtime ready: 10/10 built-in (insideRepo=true) + 0 platform tool(s), gate=open, manifest=fetch-failed
+[2026-10-29T08:54:13.027Z] INFO  [McpDaemon] [trace=826618cc073bcbafee11b3be32537cb6] MCP daemon listening on /tmp/github-copilot-uXzzPQ/.jolli-mcp-1000/af5551be0af5e1ac.sock (cwd=/home/nurmuxammad/Documents/PDF DOCS OPENER MAIN, version=0.99.18)
+[2026-10-29T08:54:13.114Z] INFO  [McpProxy] [trace=9d37e551bfa095024109d5c8420affb1] Attached to MCP daemon 12313 (v0.99.18) for /home/nurmuxammad/Documents/PDF DOCS OPENER MAIN
+[2026-10-29T08:54:13.115Z] INFO  [McpServer] [trace=826618cc073bcbafee11b3be32537cb6] MCP runtime ready: 10/10 built-in (insideRepo=true) + 0 platform tool(s), gate=open, manifest=fetch-failed
+[2026-10-29T08:54:13.134Z] INFO  [McpServer] MCP client connected: copilot-cli/1.0.85 (unmapped — candidate for CLIENTINFO_AGENTS)
+[2026-10-29T08:54:17.003Z] INFO  [EnsureGlobalDaemon] [trace=96b4d5bd33fbafc7ca864e03cf6652ab] spawned global daemon ensure helper (pid 12375)
