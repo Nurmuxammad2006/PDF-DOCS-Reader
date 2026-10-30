@@ -1,8 +1,9 @@
 package com.example.pdfdocsopener.controller;
 
 import com.example.pdfdocsopener.entity.FileMetadata;
+import com.example.pdfdocsopener.dto.file.FileResponse;
 import com.example.pdfdocsopener.services.FileService;
-import com.example.pdfdocsopener.services.InvalidFilenameException;
+import com.example.pdfdocsopener.exception.InvalidFilenameException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,8 +24,8 @@ public class FileController {
     }
 
     @GetMapping
-    public List<FileMetadata> getFilesByUser(@RequestParam Long telegramUserId) {
-        return fileService.getFilesByUser(telegramUserId);
+    public List<FileResponse> getFilesByUser(@RequestParam Long telegramUserId) {
+        return fileService.getFilesByUser(telegramUserId).stream().map(FileResponse::from).toList();
     }
 
     @PostMapping("/upload")
@@ -34,7 +35,7 @@ public class FileController {
     ) {
         try {
             FileMetadata saved = fileService.saveFile(file, telegramUserId);
-            return ResponseEntity.ok(saved);
+            return ResponseEntity.ok(FileResponse.from(saved));
         } catch (InvalidFilenameException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (Exception e) {
@@ -60,7 +61,7 @@ public class FileController {
     ) {
         try {
             FileMetadata updated = fileService.renameFile(id, newFilename);
-            return ResponseEntity.ok(updated);
+            return ResponseEntity.ok(FileResponse.from(updated));
         } catch (InvalidFilenameException e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         } catch (FileNotFoundException e) {

@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import type { FileMetadata } from '../types/file';
-import { deleteFileApi, renameFileApi } from '../services/api';
+import { deleteFileApi, renameFileApi } from '../services/fileApi';
 import { Icon } from './Icon';
+import { formatBytes } from '../utils/formatBytes';
+import { getFileBadge } from '../utils/fileIcons';
 
 interface ActionSheetProps {
     file: FileMetadata | null;
@@ -11,26 +13,6 @@ interface ActionSheetProps {
     onDeleted: () => void;
     onRenamed: (file: FileMetadata) => void;
 }
-
-const getFileBadge = (filename: string) => {
-    const ext = filename.split('.').pop()?.toLowerCase();
-
-    switch (ext) {
-        case 'pdf':
-            return { label: 'PDF', bg: '#FF3B30' };
-        case 'doc':
-        case 'docx':
-            return { label: 'DOC', bg: '#007AFF' };
-        case 'xls':
-        case 'xlsx':
-            return { label: 'XLS', bg: '#34C759' };
-        case 'ppt':
-        case 'pptx':
-            return { label: 'PPT', bg: '#FF9500' };
-        default:
-            return { label: 'FILE', bg: '#8E8E93' };
-    }
-};
 
 const copyTextToClipboard = async (text: string) => {
     try {
@@ -236,14 +218,14 @@ export const ActionSheet: React.FC<ActionSheetProps> = ({
                     <div className="ios-sheet-header">
                         <div
                             className="ios-pdf-icon-badge"
-                            style={{ backgroundColor: badge.bg }}
+                            style={{ backgroundColor: badge.color }}
                         >
                             {badge.label}
                         </div>
                         <div className="ios-file-details">
                             <span className="ios-file-title">{file.filename}</span>
                             <span className="ios-file-sub">
-                {Math.round((file.fileSize / 1024 / 1024) * 10) / 10 || 0.1} MB
+                {formatBytes(file.fileSize)}
               </span>
                         </div>
                     </div>

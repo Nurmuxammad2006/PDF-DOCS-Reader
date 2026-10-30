@@ -1,56 +1,22 @@
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { Icon } from '../components/Icon';
-import { fetchDocumentNotifications, updateDocumentNotifications } from '../services/api';
+import { useSettings } from '../hooks/useSettings';
+import { StorageUsageBar } from '../components/StorageUsageBar';
+import type { TelegramUser } from '../types/api';
 
 interface SettingsPageProps {
     telegramUserId: number;
+    usedBytes: number;
+    telegramUser?: TelegramUser;
 }
 
-export const SettingsPage: React.FC<SettingsPageProps> = ({ telegramUserId }) => {
-    const [notificationsEnabled, setNotificationsEnabled] = useState(true);
-    const [notificationsLoading, setNotificationsLoading] = useState(true);
-    const [notificationsSaving, setNotificationsSaving] = useState(false);
-    const [notificationError, setNotificationError] = useState('');
-
-    useEffect(() => {
-        let isCurrent = true;
-        fetchDocumentNotifications(telegramUserId)
-            .then((enabled) => {
-                if (isCurrent) setNotificationsEnabled(enabled);
-            })
-            .catch((error: unknown) => {
-                console.error('Failed to load notification preference:', error);
-                if (isCurrent) {
-                    setNotificationError('Could not load notification settings.');
-                }
-            })
-            .finally(() => {
-                if (isCurrent) setNotificationsLoading(false);
-            });
-
-        return () => {
-            isCurrent = false;
-        };
-    }, [telegramUserId]);
-
-    const handleNotificationToggle = async () => {
-        const nextEnabled = !notificationsEnabled;
-        setNotificationsSaving(true);
-        setNotificationError('');
-
-        try {
-            const savedEnabled = await updateDocumentNotifications(telegramUserId, nextEnabled);
-            setNotificationsEnabled(savedEnabled);
-        } catch (error: unknown) {
-            console.error('Failed to update notification preference:', error);
-            setNotificationError('Could not save notification settings. Please try again.');
-        } finally {
-            setNotificationsSaving(false);
-        }
-    };
-
-    // Fetch user profile data from Telegram WebApp SDK
-    const tgUser = window.Telegram?.WebApp?.initDataUnsafe?.user;
+export const SettingsPage: React.FC<SettingsPageProps> = ({
+    telegramUserId,
+    usedBytes,
+    telegramUser: tgUser,
+}) => {
+    const { notificationsEnabled, loading, saving, error, toggleNotifications } =
+        useSettings(telegramUserId);
 
     const firstName = tgUser?.first_name || '';
     const lastName = tgUser?.last_name || '';
@@ -60,7 +26,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ telegramUserId }) =>
     const fullName = `${firstName} ${lastName}`.trim() || 'Telegram user';
 
     // Initials for the avatar (e.g. "NU")
-    const initials = `${firstName.charAt(0)}${lastName ? lastName.charAt(0) : ''}`.toUpperCase();
+    const initials = `${firstName.charAt(0)}${lastName ? lastName.charAt(0) : ''}`.toUpperCase() || 'U';
 
     return (
         <div>
@@ -92,8 +58,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ telegramUserId }) =>
                         role="switch"
                         aria-checked={notificationsEnabled}
                         aria-label="Notifications for documents saved by the Telegram bot"
-                        disabled={notificationsLoading || notificationsSaving}
-                        onClick={handleNotificationToggle}
+                        disabled={loading || saving}
+                        onClick={() => void toggleNotifications()}
                     >
                         <span className="ios-toggle-thumb" />
                     </button>
@@ -101,8 +67,8 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ telegramUserId }) =>
                 <p className="ios-settings-hint">
                     Get a Telegram message when the bot saves a document.
                 </p>
-                {notificationError && (
-                    <p className="ios-settings-error" role="alert">{notificationError}</p>
+                {error && (
+                    <p className="ios-settings-error" role="alert">{error}</p>
                 )}
                 <div className="ios-settings-row">
                     <span className="ios-settings-label">
@@ -123,6 +89,7 @@ export const SettingsPage: React.FC<SettingsPageProps> = ({ telegramUserId }) =>
             </div>
 
             <div className="ios-card" style={{ padding: '0 16px' }}>
+                <StorageUsageBar usedBytes={usedBytes} />
                 <div className="ios-settings-row">
                     <span className="ios-settings-label">
                         <Icon name="help" />Help

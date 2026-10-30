@@ -140,7 +140,7 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ file, onClose }) => {
                 onPointerCancel={handlePointerEnd}
             >
                 {isPdf ? (
-                    <div className="ios-pdf-document">
+                    <div className="ios-pdf-document" style={{ zoom }}>
                         <Document
                             file={fileUrl}
                             onLoadSuccess={({ numPages }) => setPageCount(numPages)}
@@ -152,7 +152,7 @@ export const ViewerPage: React.FC<ViewerPageProps> = ({ file, onClose }) => {
                                 <Page
                                     key={`page-${index + 1}`}
                                     pageNumber={index + 1}
-                                    width={pageWidth * zoom}
+                                    width={pageWidth}
                                 />
                             ))}
                         </Document>

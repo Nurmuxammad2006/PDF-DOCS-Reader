@@ -1,6 +1,8 @@
 package com.example.pdfdocsopener.controller;
 
 import com.example.pdfdocsopener.services.TelegramUserPreferenceService;
+import com.example.pdfdocsopener.dto.settings.SettingsResponse;
+import com.example.pdfdocsopener.dto.settings.UpdateSettingsRequest;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -19,27 +21,21 @@ public class SettingsController {
     }
 
     @GetMapping
-    public NotificationPreferenceResponse getNotificationPreference(
+    public SettingsResponse getNotificationPreference(
             @RequestParam Long telegramUserId
     ) {
-        return new NotificationPreferenceResponse(
+        return new SettingsResponse(
                 preferenceService.areDocumentNotificationsEnabled(telegramUserId)
         );
     }
 
     @PutMapping
-    public NotificationPreferenceResponse updateNotificationPreference(
+    public SettingsResponse updateNotificationPreference(
             @RequestParam Long telegramUserId,
-            @RequestBody NotificationPreferenceRequest request
+            @RequestBody UpdateSettingsRequest request
     ) {
-        return new NotificationPreferenceResponse(
+        return new SettingsResponse(
                 preferenceService.setDocumentNotificationsEnabled(telegramUserId, request.enabled())
         );
-    }
-
-    public record NotificationPreferenceRequest(boolean enabled) {
-    }
-
-    public record NotificationPreferenceResponse(boolean enabled) {
     }
 }

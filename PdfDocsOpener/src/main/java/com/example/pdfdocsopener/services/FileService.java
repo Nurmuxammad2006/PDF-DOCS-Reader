@@ -2,15 +2,13 @@ package com.example.pdfdocsopener.services;
 
 import com.example.pdfdocsopener.entity.FileMetadata;
 import com.example.pdfdocsopener.repository.FileMetadataRepository;
+import com.example.pdfdocsopener.storage.FileStorage;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.StandardCopyOption;
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
@@ -19,9 +17,11 @@ import java.util.Optional;
 public class FileService {
 
     private final FileMetadataRepository repository;
+    private final FileStorage storage;
 
-    public FileService(FileMetadataRepository repository) {
+    public FileService(FileMetadataRepository repository, FileStorage storage) {
         this.repository = repository;
+        this.storage = storage;
     }
 
     public List<FileMetadata> getFilesByUser(Long telegramUserId) {
@@ -30,16 +30,12 @@ public class FileService {
 
     public FileMetadata saveFile(MultipartFile file, Long telegramUserId) throws IOException {
         String originalFilename = file.getOriginalFilename();
-        Path destinationPath = UploadPathResolver.resolve(originalFilename);
-
-        Files.createDirectories(UploadPathResolver.uploadDirectory());
-
         try (InputStream inputStream = file.getInputStream()) {
-            Files.copy(inputStream, destinationPath, StandardCopyOption.REPLACE_EXISTING);
+            storage.save(originalFilename, inputStream);
         }
 
         FileMetadata metadata = new FileMetadata();
-        metadata.setFilename(destinationPath.getFileName().toString());
+        metadata.setFilename(originalFilename);
         metadata.setFileType(file.getContentType());
         metadata.setFileSize(file.getSize());
         metadata.setTelegramUserId(telegramUserId);
@@ -53,8 +49,7 @@ public class FileService {
         if (optionalFile.isPresent()) {
             FileMetadata fileMetadata = optionalFile.get();
 
-            Path filePath = UploadPathResolver.resolve(fileMetadata.getFilename());
-            Files.deleteIfExists(filePath);
+            storage.delete(fileMetadata.getFilename());
 
             repository.delete(fileMetadata);
             return true;
@@ -69,33 +64,30 @@ public class FileService {
         }
 
         FileMetadata fileMetadata = optionalFile.get();
-        Path oldPath = UploadPathResolver.resolve(fileMetadata.getFilename());
+        String oldFilename = fileMetadata.getFilename();
         String requestedName = newFilename == null ? null : newFilename.trim();
-        String oldFilename = oldPath.getFileName().toString();
         int extensionIndex = oldFilename.lastIndexOf('.');
         String extension = extensionIndex > 0 ? oldFilename.substring(extensionIndex) : "";
         if (extensionIndex > 0 && requestedName != null
                 && requestedName.toLowerCase().endsWith(extension.toLowerCase())) {
             requestedName = requestedName.substring(0, requestedName.length() - extension.length());
         }
-        Path newPath = UploadPathResolver.resolve(
-                requestedName == null ? null : requestedName + extension
-        );
+        String newFilenameWithExtension = requestedName == null ? null : requestedName + extension;
 
-        if (oldPath.equals(newPath)) {
+        if (oldFilename.equals(newFilenameWithExtension)) {
             return fileMetadata;
         }
-        if (!Files.isRegularFile(oldPath)) {
+        if (!storage.exists(oldFilename)) {
             throw new FileNotFoundException("File not found on disk");
         }
 
-        Files.move(oldPath, newPath);
-        fileMetadata.setFilename(newPath.getFileName().toString());
+        storage.move(oldFilename, newFilenameWithExtension);
+        fileMetadata.setFilename(newFilenameWithExtension);
         try {
             return repository.save(fileMetadata);
         } catch (RuntimeException persistenceError) {
             try {
-                Files.move(newPath, oldPath);
+                storage.move(newFilenameWithExtension, oldFilename);
             } catch (IOException rollbackError) {
                 persistenceError.addSuppressed(rollbackError);
             }

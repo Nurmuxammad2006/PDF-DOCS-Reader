@@ -1,6 +1,11 @@
-import React, { useState } from 'react';
+import React, { useRef, useState } from 'react';
 import type { FileMetadata } from '../types/file';
 import { Icon } from '../components/Icon';
+import { Button } from '../components/ui/Button';
+import { EmptyState } from '../components/ui/EmptyState';
+import { Spinner } from '../components/ui/Spinner';
+import { formatBytes } from '../utils/formatBytes';
+import { getFileBadge } from '../utils/fileIcons';
 
 interface FilesPageProps {
     files: FileMetadata[];
@@ -10,33 +15,16 @@ interface FilesPageProps {
     uploading: boolean;
 }
 
-const getFileBadge = (filename: string) => {
-    const ext = filename.split('.').pop()?.toLowerCase();
-
-    switch (ext) {
-        case 'pdf':
-            return { label: 'PDF', bg: '#FF3B30' }; // iOS Red
-        case 'doc':
-        case 'docx':
-            return { label: 'DOC', bg: '#007AFF' }; // iOS Blue
-        case 'xls':
-        case 'xlsx':
-            return { label: 'XLS', bg: '#34C759' }; // iOS Green
-        case 'ppt':
-        case 'pptx':
-            return { label: 'PPT', bg: '#FF9500' }; // iOS Orange
-        default:
-            return { label: 'FILE', bg: '#8E8E93' }; // iOS Gray
-    }
-};
-
 export const FilesPage: React.FC<FilesPageProps> = ({
                                                         files,
                                                         loading,
                                                         onOpenFile,
+                                                        onUploadFile,
+                                                        uploading,
                                                     }) => {
     const [search, setSearch] = useState('');
     const [activeFilter, setActiveFilter] = useState('All');
+    const uploadInputRef = useRef<HTMLInputElement>(null);
 
     const filteredFiles = files.filter((file) => {
         const matchesSearch = file.filename.toLowerCase().includes(search.toLowerCase());
@@ -76,12 +64,35 @@ export const FilesPage: React.FC<FilesPageProps> = ({
                 ))}
             </div>
 
+            <input
+                ref={uploadInputRef}
+                className="visually-hidden"
+                type="file"
+                aria-label="Choose a file to upload"
+                onChange={(event) => {
+                    const selectedFile = event.currentTarget.files?.[0];
+                    if (selectedFile) void onUploadFile(selectedFile);
+                    event.currentTarget.value = '';
+                }}
+            />
+            <Button
+                type="button"
+                className="files-upload-button"
+                disabled={uploading}
+                onClick={() => uploadInputRef.current?.click()}
+            >
+                {uploading ? <Spinner label="Uploading…" /> : <><Icon name="upload" />Upload file</>}
+            </Button>
+
             {/* Document List */}
             <div className="ios-card" style={{ padding: '0 16px' }}>
                 {loading ? (
-                    <p style={{ color: '#8e8e93', padding: '16px 0', margin: 0 }}>Loading files...</p>
+                    <Spinner label="Loading files…" />
                 ) : filteredFiles.length === 0 ? (
-                    <p style={{ color: '#8e8e93', padding: '16px 0', margin: 0 }}>No files found.</p>
+                    <EmptyState
+                        title={files.length ? 'No matching files' : 'No files yet'}
+                        description={files.length ? 'Try another search or filter.' : 'Upload a document to get started.'}
+                    />
                 ) : (
                     filteredFiles.map((file) => {
                         const badge = getFileBadge(file.filename);
@@ -91,17 +102,25 @@ export const FilesPage: React.FC<FilesPageProps> = ({
                                 key={file.id}
                                 className="ios-file-row"
                                 onClick={() => onOpenFile(file)}
+                                role="button"
+                                tabIndex={0}
+                                onKeyDown={(event) => {
+                                    if (event.key === 'Enter' || event.key === ' ') {
+                                        event.preventDefault();
+                                        onOpenFile(file);
+                                    }
+                                }}
                             >
                                 <div
                                     className="ios-pdf-icon-badge"
-                                    style={{ backgroundColor: badge.bg }}
+                                    style={{ backgroundColor: badge.color }}
                                 >
                                     {badge.label}
                                 </div>
                                 <div className="ios-file-details">
                                     <span className="ios-file-title">{file.filename}</span>
                                     <span className="ios-file-sub">
-                                        {Math.round((file.fileSize / 1024 / 1024) * 10) / 10 || 0.1} MB
+                                        {formatBytes(file.fileSize)}
                                     </span>
                                 </div>
                                 <span className="ios-chevron"><Icon name="chevron" size={18} /></span>

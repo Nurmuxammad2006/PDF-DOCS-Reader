@@ -1,88 +1,45 @@
 import axios from 'axios';
-import type { FileMetadata } from '../types/file';
+import type { ApiErrorResponse } from '../types/api';
 
-const API_BASE_URL = '/api';
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api';
 
-// Axios instance configured to bypass ngrok warning pages
-const apiClient = axios.create({
+export const apiClient = axios.create({
     baseURL: API_BASE_URL,
     headers: {
         'ngrok-skip-browser-warning': 'true',
     },
 });
 
-/**
- * Fetch all files uploaded by a specific Telegram user
- */
-export const fetchUserFiles = async (
-    telegramUserId: number
-): Promise<FileMetadata[]> => {
-    const response = await apiClient.get<FileMetadata[]>('/files', {
-        params: { telegramUserId },
-    });
-    return response.data;
-};
+apiClient.interceptors.request.use((config) => {
+    const initData = window.Telegram?.WebApp?.initData;
+    if (initData) config.headers.set('X-Telegram-Init-Data', initData);
+    return config;
+});
 
-export const fetchDocumentNotifications = async (
-    telegramUserId: number
-): Promise<boolean> => {
-    const response = await apiClient.get<{ enabled: boolean }>('/settings/notifications', {
-        params: { telegramUserId },
-    });
-    return response.data.enabled;
-};
+function isBannedResponse(status: number | undefined, data: unknown): boolean {
+    if (typeof data === 'string') {
+        return data.trim().toLowerCase() === 'banned'
+            || (status === 403 && data.toLowerCase().includes('banned'));
+    }
+    if (status !== 403 && (!data || typeof data !== 'object')) return false;
+    if (!data || typeof data !== 'object') return false;
 
-export const updateDocumentNotifications = async (
-    telegramUserId: number,
-    enabled: boolean
-): Promise<boolean> => {
-    const response = await apiClient.put<{ enabled: boolean }>(
-        '/settings/notifications',
-        { enabled },
-        { params: { telegramUserId } }
+    const response = data as ApiErrorResponse;
+    const explicitBanStatus = [response.code, response.status]
+        .some((value) => typeof value === 'string' && value.toLowerCase() === 'banned');
+    return explicitBanStatus || (
+        status === 403
+        && [response.error, response.message]
+            .some((value) => typeof value === 'string' && value.toLowerCase().includes('banned'))
     );
-    return response.data.enabled;
-};
+}
 
-/**
- * Upload a document directly to Spring Boot backend
- */
-export const uploadFileApi = async (
-    file: File,
-    telegramUserId: number
-): Promise<FileMetadata> => {
-    const formData = new FormData();
-    formData.append('file', file);
-    formData.append('telegramUserId', telegramUserId.toString());
-
-    const response = await apiClient.post<FileMetadata>(
-        '/files/upload',
-        formData,
-        {
-            headers: {
-                'Content-Type': 'multipart/form-data',
-            },
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error: unknown) => {
+        if (axios.isAxiosError(error) && isBannedResponse(error.response?.status, error.response?.data)) {
+            window.dispatchEvent(new CustomEvent('app:user-banned'));
         }
-    );
-    return response.data;
-};
-
-/**
- * Delete a file by its ID
- */
-export const deleteFileApi = async (fileId: number): Promise<void> => {
-    await apiClient.delete(`/files/${fileId}`);
-};
-
-/**
- * Rename a file by its ID
- */
-export const renameFileApi = async (
-    fileId: number,
-    newFilename: string
-): Promise<FileMetadata> => {
-    const response = await apiClient.put<FileMetadata>(
-        `/files/${fileId}/rename?newFilename=${encodeURIComponent(newFilename)}`
-    );
-    return response.data;
-};
+        return Promise.reject(error);
+    },
+);

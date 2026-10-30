@@ -8,3 +8,5 @@ export interface FileMetadata {
 }
 
 export type TabType = 'home' | 'files' | 'settings';
+
+export type FileListResponse = FileMetadata[];
